@@ -1,72 +1,300 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duelo de Castelos - Versão Final</title>
+    <style>
+        :root {
+            --cor-pedra: #7f8c8d;
+            --cor-pedra-escura: #2c3e50;
+            --cor-madeira: #5d4037;
+            --cor-grama: #27ae60;
+            --cor-ceu: #d6eaf8;
+            --cor-dinheiro: #2ecc71;
+            /* Tamanho dos blocos aumentado */
+            --tamanho-bloco: 110px;
+        }
 
-  <meta charset="UTF-8">
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial Black', sans-serif;
+        }
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+        body {
+            background-color: var(--cor-ceu);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
 
-  <title>
-    Planejamento Semanal
-  </title>
+        h1 {
+            margin-top: 20px;
+            color: #2c3e50;
+            text-transform: uppercase;
+            font-size: 2.5em;
+            z-index: 10;
+        }
 
-  <link rel="stylesheet" href="style.css">
+        /* Área Principal */
+        #arena {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end; /* Força os castelos para baixo */
+            width: 100%;
+            max-width: 1400px;
+            flex: 1;
+            z-index: 5;
+        }
 
+        /* Chão */
+        #chao {
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to bottom, var(--cor-grama), #1e8449);
+            border-top: 6px solid #196f3d;
+            z-index: 6;
+        }
+
+        .container-castelo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Garante que o castelo encoste no chão */
+            margin-bottom: 0; 
+        }
+
+        .nome-time {
+            background: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            margin-bottom: 100px; /* Aumentado para dar espaço à bandeira */
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            font-size: 1.4em;
+            border: 3px solid var(--cor-pedra-escura);
+            text-align: center;
+            min-width: 300px;
+        }
+
+        /* Estrutura do Castelo */
+        .castelo {
+            display: grid;
+            grid-template-columns: repeat(3, var(--tamanho-bloco));
+            grid-template-rows: repeat(3, var(--tamanho-bloco));
+            gap: 4px;
+            position: relative;
+        }
+
+        .bloco {
+            background: var(--cor-pedra);
+            border: 4px solid var(--cor-pedra-escura);
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.6s cubic-bezier(0.5, 0, 1, 1), opacity 0.4s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset -6px -6px 0 rgba(0,0,0,0.1);
+        }
+
+        .bloco:hover { filter: brightness(1.1); transform: scale(1.02); }
+
+        /* Estilos Medievais */
+        .topo-torre {
+            clip-path: polygon(0% 100%, 0% 20%, 25% 20%, 25% 0%, 50% 0%, 50% 20%, 75% 20%, 75% 0%, 100% 0%, 100% 100%);
+            background: #95a5a6;
+        }
+
+        .porta {
+            grid-column: 2;
+            background: var(--cor-madeira);
+            border-radius: 60px 60px 0 0;
+            border: 4px solid #3e2723;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.4);
+        }
+
+        .janela::after {
+            content: '';
+            width: 25px;
+            height: 35px;
+            background: #2c3e50;
+            border-radius: 8px 8px 0 0;
+        }
+
+        /* 10ª Peça: Bandeira Posicionada Corretamente */
+        .bandeira {
+            position: absolute;
+            top: -80px; /* Fica acima da torre */
+            left: calc(var(--tamanho-bloco) / 2);
+            transform: translateX(-50%);
+            width: 60px;
+            height: 80px;
+            cursor: pointer;
+            z-index: 20;
+            transition: transform 0.6s;
+        }
+
+        .mastro {
+            width: 6px;
+            height: 100%;
+            background: #333;
+            margin: 0 auto;
+        }
+
+        .pano {
+            width: 45px;
+            height: 30px;
+            background: #e74c3c;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            border: 2px solid #c0392b;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Animações */
+        .cair {
+            transform: translateY(1000px) rotate(45deg);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .cifrao {
+            position: absolute;
+            color: var(--cor-dinheiro);
+            font-size: 3em;
+            font-weight: bold;
+            pointer-events: none;
+            animation: subir 1s forwards;
+            z-index: 100;
+            text-shadow: 3px 3px 0px #000;
+        }
+
+        @keyframes subir {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-150px); opacity: 0; }
+        }
+
+        /* Modal */
+        #modal {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 0 100px rgba(0,0,0,0.6);
+            z-index: 1000;
+            border: 8px solid var(--cor-grama);
+            min-width: 400px;
+        }
+
+        #modal h2 { color: #2c3e50; font-size: 2em; margin-bottom: 10px; }
+        #modal p { font-size: 1.2em; margin-bottom: 5px; }
+
+        button {
+            margin-top: 30px;
+            padding: 15px 40px;
+            background: var(--cor-grama);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        button:hover { background: #1e8449; }
+    </style>
 </head>
 <body>
 
-  <div class="container">
+    <h1>Duelo de Castelos</h1>
 
-    <h1>
-      📚 Planejamento Semanal
-    </h1>
+    <div id="arena">
+        <div class="container-castelo">
+            <div class="nome-time">TIME ANTI TIGRINHO</div>
+            <div id="esq" class="castelo">
+                <div class="bandeira" onclick="atirar('esq', this, event)">
+                    <div class="pano"></div><div class="mastro"></div>
+                </div>
+                <div class="bloco topo-torre" onclick="atirar('esq', this, event)"></div>
+                <div class="bloco" onclick="atirar('esq', this, event)"></div>
+                <div class="bloco topo-torre" onclick="atirar('esq', this, event)"></div>
+                <div class="bloco janela" onclick="atirar('esq', this, event)"></div>
+                <div class="bloco" onclick="atirar('esq', this, event)"></div>
+                <div class="bloco janela" onclick="atirar('esq', this, event)"></div>
+                <div class="bloco" onclick="atirar('esq', this, event)"></div>
+                <div class="bloco porta" onclick="atirar('esq', this, event)"></div>
+                <div class="bloco" onclick="atirar('esq', this, event)"></div>
+            </div>
+        </div>
 
-    <div class="topo">
+        <div class="container-castelo">
+            <div class="nome-time">TIME FAZ O PIX</div>
+            <div id="dir" class="castelo">
+                <div class="bandeira" onclick="atirar('dir', this, event)">
+                    <div class="pano" style="background: #3498db; border-color: #2980b9;"></div><div class="mastro"></div>
+                </div>
+                <div class="bloco topo-torre" onclick="atirar('dir', this, event)"></div>
+                <div class="bloco" onclick="atirar('dir', this, event)"></div>
+                <div class="bloco topo-torre" onclick="atirar('dir', this, event)"></div>
+                <div class="bloco janela" onclick="atirar('dir', this, event)"></div>
+                <div class="bloco" onclick="atirar('dir', this, event)"></div>
+                <div class="bloco janela" onclick="atirar('dir', this, event)"></div>
+                <div class="bloco" onclick="atirar('dir', this, event)"></div>
+                <div class="bloco porta" onclick="atirar('dir', this, event)"></div>
+                <div class="bloco" onclick="atirar('dir', this, event)"></div>
+            </div>
+        </div>
+    </div>
 
-      <div class="campo-topo">
+    <div id="chao"></div>
 
-        <label>
-          Semana
-        </label>
+    <div id="modal">
+        <h2 id="win-text"></h2>
+        <p id="lose-text"></p>
+        <button onclick="location.reload()">REINICIAR BATALHA</button>
+    </div>
 
-        <input
-          type="week"
-          id="semana"
-        >
+    <script>
+        let pontos = { esq: 10, dir: 10 };
 
-      </div>
+        function atirar(time, el, ev) {
+            if (el.classList.contains('cair')) return;
 
-      <div class="campo-topo">
+            el.classList.add('cair');
+            pontos[time]--;
 
-        <label>
-          Filtrar Dia
-        </label>
+            // Efeito Cifrão Grande
+            const cifrao = document.createElement('div');
+            cifrao.className = 'cifrao';
+            cifrao.innerText = '$';
+            cifrao.style.left = ev.pageX + 'px';
+            cifrao.style.top = ev.pageY + 'px';
+            document.body.appendChild(cifrao);
+            setTimeout(() => cifrao.remove(), 1000);
 
-        <select id="filtroDia">
-
-          <option>Todos</option>
-
-          <option>Seg</option>
-          <option>Ter</option>
-          <option>Qua</option>
-          <option>Qui</option>
-          <option>Sex</option>
-
-        </select>
-
-      </div>
-
-      <div class="campo-topo">
-
-        <label>
-          Filtrar Turma
-        </label>
-
-        <select id="filtroTurma">
-
-          <option>Todas</option>
-
+            if (pontos[time] === 0) {
+                const modal = document.getElementById('modal');
+                const win = document.getElementById('win-text');
+                const lose = document.getElementById('lose-text');
+                
+                modal.style.display = 'block';
+                if (time === 'esq') {
+                    lose.innerText = "TIME ANTI TIGRINHO: SEU CASTELO CAIU";
+                    win.innerText = "TIME FAZ O PIX: SEU CASTELO FOI O VENCEDOR";
+                } else {
+                    lose.innerText = "TIME FAZ O PIX: SEU CASTELO CAIU";
+                    win.innerText = "TIME ANTI TIGRINHO: SEU CASTELO FOI O VENCEDOR";
+                }
+            }
+        }
+    </script>
+</body>
 </html>
