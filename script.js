@@ -1,39 +1,63 @@
 const grade = [
+        </td>
 
-  ["Seg", "1ª série", "Matemática"],
-  ["Seg", "1ª série", "Matemática"],
-  ["Seg", "1ª série", "Ed. Digital"],
-  ["Seg", "2ª série", "Ed. Financeira"],
-  ["Seg", "2ª série", "Ed. Financeira"],
-  ["Seg", "7º ano", "Matemática"],
-  ["Seg", "7º ano", "Matemática"],
-  ["Seg", "6º ano", "Matemática"],
-  ["Seg", "8º ano", "Matemática"],
-  ["Seg", "8º ano", "Matemática"],
+        <td>
 
-  ["Ter", "3ª série", "Ed. Financeira"],
+          <input
+            class="campo"
+            value="${atividade}"
+            onblur="salvarCampo(${index}, 'atividade', this.value)"
+          >
 
-  ["Qua", "9º ano", "Recomposição"],
-  ["Qua", "9º ano", "Recomposição"],
-  ["Qua", "1ª série", "Matemática"],
-  ["Qua", "1ª série", "Matemática"],
-  ["Qua", "7º ano", "Matemática"],
-  ["Qua", "7º ano", "Matemática"],
-  ["Qua", "6º ano", "Recomposição"],
-  ["Qua", "6º ano", "Recomposição"],
+        </td>
 
-  ["Qui", "6º ano", "Matemática"],
+      </tr>
 
-  ["Sex", "3ª série", "Ed. Financeira"],
-  ["Sex", "1ª série", "Ed. Financeira"],
-  ["Sex", "1ª série", "Ed. Financeira"],
-  ["Sex", "1ª série", "Ed. Digital"],
-  ["Sex", "7º ano", "Matemática"],
-  ["Sex", "6º ano", "Matemática"],
-  ["Sex", "6º ano", "Matemática"],
-  ["Sex", "8º ano", "Matemática"],
-  ["Sex", "8º ano", "Matemática"]
+    `;
 
-];
+  });
 
-console.log("Sistema iniciado");
+}
+
+semanaInput.addEventListener("change", () => {
+
+  renderizar();
+
+  verificarPendencias();
+
+});
+
+filtroDia.addEventListener("change", renderizar);
+filtroTurma.addEventListener("change", renderizar);
+filtroDisciplina.addEventListener("change", renderizar);
+
+// RELATÓRIO
+
+document
+  .getElementById("verRelatorio")
+  .addEventListener("click", () => {
+
+    let html = `
+
+      <html>
+
+      <head>
+
+        <title>Relatório Geral</title>
+
+        <style>
+
+          body {
+            font-family: Arial;
+            padding: 20px;
+            background: #f3f4f6;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+          }
+
+          th {
+            background: #
